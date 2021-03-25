@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel='stylesheet' href='{% static ' css/style.css' %}'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Wall Assignment</title>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <nav class="navbar navbar-light bg-dark text-white">CodingDojo Wall
+            <p>Welcome, {{ request.session.user_first_name }}</p><a href="/users/logout">Log off</a>
+        </nav>
+        <form action="/post_message" method="post">
+            {% csrf_token %}
+            <div class="form-group mt-3">
+                <label for="message">Post a message</label>
+                <textarea name="message" id="" cols="20" rows="10" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Post a message</button>
+        </form>
+    {% for message in all_messages reversed %}
+    <h3>Message:</h3>
+    <p>added by: {{ message.user.first_name }}</p>
+    <p>Date: {{ message.created_at }}</p>
+    <p>{{message.content}}</p>
+    <form action="/delete_message" method="post">
+        {% csrf_token %}
+        <div class="form-group mt-3">
+            <input type="hidden" value="{{message.id}}" name="message_id">
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Delete Message</button>
+    </form>
+    <h3>Comments:</h3>
+    {% for comment in message.comments.all %}
+    <p>{{comment.content}}</p>
+    <form action="/delete_comment" method="post">
+        {% csrf_token %}
+        <div class="form-group mt-3">
+            <input type="hidden" value="{{comment.id}}" name="comment_id">
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Delete Comment</button>
+    </form>
+    {% endfor%}
+    <form action="/post_comment" method="post">
+        {% csrf_token %}
+        <div class="form-group mt-3">
+            <label for="comment">Post a comment</label>
+            <textarea name="comment" id="comment" cols="20" rows="10" class="form-control"></textarea>
+            <input type="hidden" value="{{ message.id }}" name="message_id">
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Comment</button>
+    </form>
+    {% endfor %}
+    <!--  -->
+</div>
+</body>
+
+</html>

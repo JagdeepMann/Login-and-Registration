@@ -1,5 +1,4 @@
 from django.db import models
-# from __future__ import unicode_literals
 import re
 
 
@@ -14,7 +13,7 @@ class UserManager(models.Manager):
             errors['first_name'] = "First name must have at least 2 letters."
 
         if len(postData['last_name']) < 2:
-            errors['first_name'] = "First name must have at least 2 letters."
+            errors['last_name'] = "Last name must have at least 2 letters."
 
         if not EMAIL_REGEX.match(postData['email']):
             errors['email'] = "Invalid email address!"
@@ -45,5 +44,34 @@ class User(models.Model):
     password = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    #messages = finds the messages from each user
+        # e.g (specific user).messages.all() == list of message objects
+        
+    #comments = finds the comments from each user
+        # e.g this_user.comments.all() == list of all comment objects
+    objects = UserManager()
 
-    objects = UserManager()  # reference to manager
+
+class Message(models.Model):
+    content = models.TextField() # content in place of message
+    user = models.ForeignKey(User, related_name="messages", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # comments =  finds the comments for each message
+        # e.g this_message.comments.all() == list of all comment objects
+    objects = UserManager()
+    
+class Comment(models.Model):
+    content = models.TextField()
+    user =  models.ForeignKey(User, related_name = "comments", on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, related_name = "comments", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = UserManager()
+    
+    #{{comment.user.first_name}} 
+    #{{comment.message.content}}
+    
+    
+    
